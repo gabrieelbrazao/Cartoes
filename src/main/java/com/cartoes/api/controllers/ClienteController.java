@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
  
 import com.cartoes.api.entities.Cliente;
+import com.cartoes.api.response.Response;
 import com.cartoes.api.services.ClienteService;
 import com.cartoes.api.utils.ConsistenciaException;
  
@@ -35,22 +36,28 @@ public class ClienteController {
    	 * @return Dados do cliente
    	 */
    	@GetMapping(value = "/{id}")
-   	public ResponseEntity<Cliente> buscarPorId(@PathVariable("id") int id) {
+   	public ResponseEntity<Response<Cliente>> buscarPorId(@PathVariable("id") int id) {
+   		
+   			Response<Cliente> response = new Response<Cliente>();
  
          	try {
  
                 	log.info("Controller: buscando cliente com id: {}", id);
                 	
                 	Optional<Cliente> cliente = clienteService.buscarPorId(id);
+                	
+                	response.setDados(cliente.get());
  
-                	return ResponseEntity.ok(cliente.get());
+                	return ResponseEntity.ok(response);
  
          	} catch (ConsistenciaException e) {
                 	log.info("Controller: Inconsistência de dados: {}", e.getMessage());
-                	return ResponseEntity.badRequest().body(new Cliente());
+                	response.adicionarErro(e.getMensagem());
+                	return ResponseEntity.badRequest().body(response);
          	} catch (Exception e) {
                 	log.error("Controller: Ocorreu um erro na aplicação: {}", e.getMessage());
-                	return ResponseEntity.status(500).body(new Cliente());
+                	response.adicionarErro("Ocorreu um erro na aplicação: {}", e.getMessage());
+                	return ResponseEntity.status(500).body(response);
          	}
  
    	}
@@ -62,7 +69,9 @@ public class ClienteController {
    	 * @return Dados do cliente
    	 */
    	@GetMapping(value = "/cpf/{cpf}")
-   	public ResponseEntity<Cliente> buscarPorCpf(@PathVariable("cpf") String cpf) {
+   	public ResponseEntity<Response<Cliente>> buscarPorCpf(@PathVariable("cpf") String cpf) {
+   		
+   			Response<Cliente> response = new Response<Cliente>();
  
          	try {
  
@@ -70,14 +79,18 @@ public class ClienteController {
  
                 	Optional<Cliente> cliente = clienteService.buscarPorCpf(cpf);
  
-                	return ResponseEntity.ok(cliente.get());
+                	response.setDados(cliente.get());
+                	 
+                	return ResponseEntity.ok(response);
  
          	} catch (ConsistenciaException e) {
                 	log.info("Controller: Inconsistência de dados: {}", e.getMessage());
-                	return ResponseEntity.badRequest().body(new Cliente());
+                	response.adicionarErro(e.getMensagem());
+                	return ResponseEntity.badRequest().body(response);
          	} catch (Exception e) {
                 	log.error("Controller: Ocorreu um erro na aplicação: {}", e.getMessage());
-                	return ResponseEntity.status(500).body(new Cliente());
+                	response.adicionarErro("Ocorreu um erro na aplicação: {}", e.getMessage());
+                	return ResponseEntity.status(500).body(response);
          	}
  
    	}
@@ -89,20 +102,26 @@ public class ClienteController {
    	 * @return Dados do cliente persistido
    	 */
    	@PostMapping
-   	public ResponseEntity<Cliente> salvar(@RequestBody Cliente cliente) {
+   	public ResponseEntity<Response<Cliente>> salvar(@RequestBody Cliente cliente) {
+   		
+   			Response<Cliente> response = new Response<Cliente>();
  
          	try {
  
                 	log.info("Controller: salvando o cliente: {}", cliente.toString());
  
-                	return ResponseEntity.ok(this.clienteService.salvar(cliente));
+                	response.setDados(this.clienteService.salvar(cliente));
+                	 
+                	return ResponseEntity.ok(response);
  
          	} catch (ConsistenciaException e) {
                 	log.info("Controller: Inconsistência de dados: {}", e.getMessage());
-                	return ResponseEntity.badRequest().body(new Cliente());
+                	response.adicionarErro(e.getMensagem());
+                	return ResponseEntity.badRequest().body(response);
          	} catch (Exception e) {
                 	log.error("Controller: Ocorreu um erro na aplicação: {}", e.getMessage());
-                	return ResponseEntity.status(500).body(new Cliente());
+                	response.adicionarErro("Ocorreu um erro na aplicação: {}", e.getMessage());
+                	return ResponseEntity.status(500).body(response);
          	}
  
    	}

@@ -1,6 +1,5 @@
 package com.cartoes.api.controllers;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,7 +15,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cartoes.api.entities.Cartao;
 import com.cartoes.api.entities.Transacao;
+import com.cartoes.api.response.Response;
 import com.cartoes.api.services.TransacaoService;
 import com.cartoes.api.utils.ConsistenciaException;
 
@@ -30,34 +31,46 @@ public class TransacaoController {
    	private TransacaoService transacaoService;
 	
 	@GetMapping(value = "/cartao/{cartaoNumero}")
-   	public ResponseEntity<List<Transacao>> buscarNumeroCartao(@PathVariable("cartaoNumero") String cartaoNumero) {
+   	public ResponseEntity<Response<List<Transacao>>> buscarNumeroCartao(@PathVariable("cartaoNumero") String cartaoNumero) {
+		
+		Response<List<Transacao>> response = new Response<List<Transacao>>();
+		
         try {
             log.info("Controller: buscando transação pelo número de cartão: {}", cartaoNumero);
  
             Optional<List<Transacao>> transacoes = transacaoService.buscarPorCartaoNumero(cartaoNumero);
  
-            return ResponseEntity.ok(transacoes.get());
+            response.setDados(transacoes.get());
+        	return ResponseEntity.ok(response);
         } catch (ConsistenciaException e) {
             log.info("Controller: Inconsistência de dados: {}", e.getMessage());
-            return ResponseEntity.badRequest().body(new ArrayList<Transacao>());
+            response.adicionarErro("Controller: Inconsistência de dados: {}", e.getMensagem());
+        	return ResponseEntity.badRequest().body(response);
         } catch (Exception e) {
             log.error("Controller: Ocorreu um erro na aplicação: {}", e.getMessage());
-            return ResponseEntity.status(500).body(new ArrayList<Transacao>());
+            response.adicionarErro("Controller: Ocorreu um erro na aplicação: {}", e.getMessage());
+            return ResponseEntity.status(500).body(response);
         }
    	}
 	
 	@PostMapping
-   	public ResponseEntity<Transacao> salvar(@RequestBody Transacao transacao) {
-         try {
+   	public ResponseEntity<Response<Transacao>> salvar(@RequestBody Transacao transacao) {
+		
+		Response<Transacao> response = new Response<Transacao>();
+		
+        try {
         	 log.info("Controller: salvando a transação: {}", transacao.toString());
- 
-             return ResponseEntity.ok(transacaoService.salvar(transacao));
-         } catch (ConsistenciaException e) {
-             log.info("Controller: Inconsistência de dados: {}", e.getMessage());
-             return ResponseEntity.badRequest().body(new Transacao());
-         } catch (Exception e) {
-             log.error("Controller: Ocorreu um erro na aplicação: {}", e.getMessage());
-             return ResponseEntity.status(500).body(new Transacao());
-         }
+             
+             response.setDados(transacaoService.salvar(transacao));
+         	 return ResponseEntity.ok(response);
+        } catch (ConsistenciaException e) {
+            log.info("Controller: Inconsistência de dados: {}", e.getMessage());
+            response.adicionarErro("Controller: Inconsistência de dados: {}", e.getMensagem());
+        	return ResponseEntity.badRequest().body(response);
+        } catch (Exception e) {
+            log.error("Controller: Ocorreu um erro na aplicação: {}", e.getMessage());
+            response.adicionarErro("Controller: Ocorreu um erro na aplicação: {}", e.getMessage());
+        	return ResponseEntity.badRequest().body(response);
+        }
    	}
 }
