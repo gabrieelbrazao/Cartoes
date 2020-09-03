@@ -73,6 +73,6 @@ public class TransacaoDto {
             + "valor=" + valor + ","
             + "qdtParcelas=" + qdtParcelas + ","
 			+ "juros=" + juros + ","
-			+ "cartao=" + cartao + "]";
+			+ "cartaoId=" + cartaoId + "]";
    	}
 }
