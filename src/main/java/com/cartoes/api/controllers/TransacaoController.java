@@ -15,11 +15,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cartoes.api.entities.Cartao;
+import com.cartoes.api.dtos.TransacaoDto;
 import com.cartoes.api.entities.Transacao;
 import com.cartoes.api.response.Response;
 import com.cartoes.api.services.TransacaoService;
 import com.cartoes.api.utils.ConsistenciaException;
+import com.cartoes.api.utils.ConversaoUtils;
 
 @RestController
 @RequestMapping("/api/transacao")
@@ -31,16 +32,16 @@ public class TransacaoController {
    	private TransacaoService transacaoService;
 	
 	@GetMapping(value = "/cartao/{cartaoNumero}")
-   	public ResponseEntity<Response<List<Transacao>>> buscarNumeroCartao(@PathVariable("cartaoNumero") String cartaoNumero) {
+   	public ResponseEntity<Response<List<TransacaoDto>>> buscarNumeroCartao(@PathVariable("cartaoNumero") String cartaoNumero) {
 		
-		Response<List<Transacao>> response = new Response<List<Transacao>>();
+		Response<List<TransacaoDto>> response = new Response<List<TransacaoDto>>();
 		
         try {
             log.info("Controller: buscando transação pelo número de cartão: {}", cartaoNumero);
  
             Optional<List<Transacao>> transacoes = transacaoService.buscarPorCartaoNumero(cartaoNumero);
  
-            response.setDados(transacoes.get());
+            response.setDados(ConversaoUtils.ConverterListaDeTransacoes(transacoes.get()));
         	return ResponseEntity.ok(response);
         } catch (ConsistenciaException e) {
             log.info("Controller: Inconsistência de dados: {}", e.getMessage());
@@ -54,14 +55,16 @@ public class TransacaoController {
    	}
 	
 	@PostMapping
-   	public ResponseEntity<Response<Transacao>> salvar(@RequestBody Transacao transacao) {
+   	public ResponseEntity<Response<TransacaoDto>> salvar(@RequestBody TransacaoDto TransacaoDto) {
 		
-		Response<Transacao> response = new Response<Transacao>();
+		Response<TransacaoDto> response = new Response<TransacaoDto>();
 		
         try {
-        	 log.info("Controller: salvando a transação: {}", transacao.toString());
+        	 log.info("Controller: salvando a transação: {}", TransacaoDto.toString());
              
-             response.setDados(transacaoService.salvar(transacao));
+        	 Transacao transacao = this.transacaoService.salvar(ConversaoUtils.Converter(TransacaoDto));
+         	 response.setDados(ConversaoUtils.Converter(transacao));
+         	 
          	 return ResponseEntity.ok(response);
         } catch (ConsistenciaException e) {
             log.info("Controller: Inconsistência de dados: {}", e.getMessage());

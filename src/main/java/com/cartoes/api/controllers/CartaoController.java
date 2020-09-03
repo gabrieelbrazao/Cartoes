@@ -15,11 +15,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
- 
+
+import com.cartoes.api.dtos.CartaoDto;
 import com.cartoes.api.entities.Cartao;
 import com.cartoes.api.response.Response;
 import com.cartoes.api.services.CartaoService;
 import com.cartoes.api.utils.ConsistenciaException;
+import com.cartoes.api.utils.ConversaoUtils;
  
 @RestController
 @RequestMapping("/api/cartao")
@@ -38,9 +40,9 @@ public class CartaoController {
    	 * @return Lista de cartões que o cliente possui
    	 */
    	@GetMapping(value = "/cliente/{clienteId}")
-   	public ResponseEntity<Response<List<Cartao>>> buscarPorClienteId(@PathVariable("clienteId") int clienteId) {
+   	public ResponseEntity<Response<List<CartaoDto>>> buscarPorClienteId(@PathVariable("clienteId") int clienteId) {
  
-   			Response<List<Cartao>> response = new Response<List<Cartao>>();
+   			Response<List<CartaoDto>> response = new Response<List<CartaoDto>>();
    		
          	try {
  
@@ -48,7 +50,7 @@ public class CartaoController {
  
                 	Optional<List<Cartao>> listaCartoes = cartaoService.buscarPorClienteId(clienteId);
  
-                	response.setDados(listaCartoes.get());
+                	response.setDados(ConversaoUtils.ConverterLista(listaCartoes.get()));
                 	 
                 	return ResponseEntity.ok(response);
  
@@ -71,15 +73,16 @@ public class CartaoController {
    	 * @return Dados do cartao persistido
    	 */
    	@PostMapping
-   	public ResponseEntity<Response<Cartao>> salvar(@RequestBody Cartao cartao) {
+   	public ResponseEntity<Response<CartaoDto>> salvar(@RequestBody CartaoDto cartaoDto) {
    		
-   			Response<Cartao> response = new Response<Cartao>();
+   			Response<CartaoDto> response = new Response<CartaoDto>();
  
          	try {
  
-                	log.info("Controller: salvando o cartao: {}", cartao.toString());
+                	log.info("Controller: salvando o cartao: {}", cartaoDto.toString());
          	
-                	response.setDados(this.cartaoService.salvar(cartao));
+                	Cartao cartao = this.cartaoService.salvar(ConversaoUtils.Converter(cartaoDto));
+                	response.setDados(ConversaoUtils.Converter(cartao));
                 	 
                 	return ResponseEntity.ok(response);
  
