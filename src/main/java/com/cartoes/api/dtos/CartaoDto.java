@@ -1,10 +1,23 @@
 package com.cartoes.api.dtos;
 
+import javax.validation.constraints.NotEmpty;
+
+import org.hibernate.validator.constraints.Length;
+
 public class CartaoDto {
 	private String id;
+	
+	@NotEmpty(message = "Numero não pode ser vazio.")
+   	@Length(min = 16, max = 16, message = "Numero deve conter 16 caracteres.")
    	private String numero;
+	
+	@NotEmpty(message = "Data de validade não pode ser vazio.")
    	private String dataValidade;
+	
+	@NotEmpty(message = "Bloqueado de validade não pode ser vazio.")
    	private String bloqueado;
+	
+	@NotEmpty(message = "O ID do cliente não pode ser vazio.")
    	private String clienteId;
    	
    	public String getId() {
