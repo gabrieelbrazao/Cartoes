@@ -42,14 +42,14 @@ public class TransacaoService {
 	public Transacao salvar(Transacao transacao) throws ConsistenciaException {
      	log.info("Service: salvando a transação: {}", transacao);
      	
-     	Optional<Cartao> cartao = Optional.ofNullable(cartaoRepository.findByNumero(transacao.getCartao().getNumero()));
+     	Cartao cartao = cartaoRepository.findByNumero(transacao.getCartao().getNumero());
      	
-     	if (!cartao.isPresent()) {
+     	if (!Optional.ofNullable(cartao).isPresent()) {
             log.info("Service: Nenhum cartão de número: {} foi encontrado", transacao.getCartao().getNumero());
             throw new ConsistenciaException("Nenhum cartão de número: {} foi encontrado", transacao.getCartao().getNumero());
      	}
      	
-     	transacao.setCartao(cartaoRepository.findByNumero(transacao.getCartao().getNumero()));
+     	transacao.setCartao(cartao);
      	
      	if(transacao.getCartao().getBloqueado()) {
      		log.info("Service: Não é possível incluir transações para este cartão, pois o mesmo encontra-se bloqueado");
