@@ -140,7 +140,7 @@ public class ConversaoUtils {
 
 	}
 	
-	public static Usuario Converter(UsuarioDto usuarioDto) {
+	public static Usuario Converter(UsuarioDto usuarioDto) throws ParseException {
 		 
      	Usuario usuario = new Usuario();
 
@@ -150,6 +150,7 @@ public class ConversaoUtils {
      	usuario.setNome(usuarioDto.getNome());
      	usuario.setCpf(usuarioDto.getCpf());
      	usuario.setAtivo(Boolean.parseBoolean(usuarioDto.getAtivo()));
+     	usuario.setUltimoAcesso(new SimpleDateFormat("dd/MM/yyyy").parse(usuarioDto.getUltimoAcesso()));
 
      	if (usuarioDto.getRegras() != null && usuarioDto.getRegras().size() > 0) {
 

@@ -23,6 +23,8 @@ public class UsuarioDto {
    	@NotEmpty(message = "Ativo não pode ser vazio.")
    	private String ativo;
    	
+   	private String ultimoAcesso;
+   	
    	private List<RegraDto> regras;
    	
    	public String getId() {
@@ -56,6 +58,14 @@ public class UsuarioDto {
    	public void setAtivo(String ativo) {
          	this.ativo = ativo;
    	}
+   	
+   	public String getUltimoAcesso() {
+     	return ultimoAcesso;
+	}
+	
+	public void setUltimoAcesso(String ultimoAcesso) {
+     	this.ultimoAcesso = ultimoAcesso;
+	}
    	
    	public List<RegraDto> getRegras() {
          	return regras;
